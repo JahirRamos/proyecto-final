@@ -6,7 +6,7 @@ struct Registrocotocollao{
     int o3;
     int no2;
     int so2;
-    int co;
+    int co2;
 
 };
 

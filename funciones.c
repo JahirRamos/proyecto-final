@@ -42,7 +42,7 @@ void mostrarZonasUrbanas(){
     printf("- O3 (Ozono)\n");
     printf("- NO2 (Dioxido de nitrogeno)\n");
     printf("- SO2 (Dioxido de azufre)\n");
-    printf("- CO (Monoxido de carbono)\n");
+    printf("- CO2 (Dioxido  de carbono)\n");
     printf("\n");
 }
 
@@ -193,9 +193,9 @@ int leerDatosZona(const char* nombreArchivo, struct Registrocotocollao registros
          
             columna = strtok(NULL, ",");
             if (columna != NULL && strlen(columna) > 0) {
-                registros[contador].co = atoi(columna);
+                registros[contador].co2 = atoi(columna);
             } else {
-                registros[contador].co = 0;
+                registros[contador].co2 = 0;
             }
             
             contador++;
@@ -216,7 +216,7 @@ void mostrarDatosArchivo(struct Registrocotocollao registros[], int numRegistros
     printf("\n=== DATOS DE CONTAMINACION ACTUAL - %s ===\n", nombreZona);
     printf("Mostrando los ultimos %d dias de monitoreo\n", registrosAMostrar);
     printf("=====================================================================================================\n");
-    printf("Fecha\t\tPM2.5\tPM10\tO3\tNO2\tSO2\tCO\tEstado General\n");
+    printf("Fecha\t\tPM2.5\tPM10\tO3\tNO2\tSO2\tCO2\tEstado General\n");
     printf("=====================================================================================================\n");
     
     int contadores[3] = {0, 0, 0}; // BUENO, MODERADO, ALTO
@@ -228,18 +228,18 @@ void mostrarDatosArchivo(struct Registrocotocollao registros[], int numRegistros
         char *estadoO3 = evaluarContaminante(registros[i].o3, "O3");
         char *estadoNO2 = evaluarContaminante(registros[i].no2, "NO2");
         char *estadoSO2 = evaluarContaminante(registros[i].so2, "SO2");
-        char *estadoCO = evaluarContaminante(registros[i].co, "CO");
+        char *estadoCO2 = evaluarContaminante(registros[i].co2, "CO2");
         
         // Determinar estado general basado en el peor contaminante
         char *estadoGeneral = "BUENO";
         if (strcmp(estadoPM25, "ALTO") == 0 || strcmp(estadoPM10, "ALTO") == 0 || 
             strcmp(estadoO3, "ALTO") == 0 || strcmp(estadoNO2, "ALTO") == 0 || 
-            strcmp(estadoSO2, "ALTO") == 0 || strcmp(estadoCO, "ALTO") == 0) {
+            strcmp(estadoSO2, "ALTO") == 0 || strcmp(estadoCO2, "ALTO") == 0) {
             estadoGeneral = "ALTO";
             contadores[2]++;
         } else if (strcmp(estadoPM25, "MODERADO") == 0 || strcmp(estadoPM10, "MODERADO") == 0 || 
                    strcmp(estadoO3, "MODERADO") == 0 || strcmp(estadoNO2, "MODERADO") == 0 || 
-                   strcmp(estadoSO2, "MODERADO") == 0 || strcmp(estadoCO, "MODERADO") == 0) {
+                   strcmp(estadoSO2, "MODERADO") == 0 || strcmp(estadoCO2, "MODERADO") == 0) {
             estadoGeneral = "MODERADO";
             contadores[1]++;
         } else {
@@ -249,7 +249,7 @@ void mostrarDatosArchivo(struct Registrocotocollao registros[], int numRegistros
         printf("%-12s\t%d\t%d\t%d\t%d\t%d\t%d\t%s\n",
                registros[i].fecha, registros[i].pm25, registros[i].pm10,
                registros[i].o3, registros[i].no2, registros[i].so2,
-               registros[i].co, estadoGeneral);
+               registros[i].co2, estadoGeneral);
     }
     
     // Mostrar resumen estadístico solo de los ultimos 3 dias
@@ -278,14 +278,14 @@ void mostrarDatosArchivo(struct Registrocotocollao registros[], int numRegistros
             strcmp(evaluarContaminante(registros[0].o3, "O3"), "ALTO") == 0 || 
             strcmp(evaluarContaminante(registros[0].no2, "NO2"), "ALTO") == 0 || 
             strcmp(evaluarContaminante(registros[0].so2, "SO2"), "ALTO") == 0 || 
-            strcmp(evaluarContaminante(registros[0].co, "CO"), "ALTO") == 0) {
+            strcmp(evaluarContaminante(registros[0].co2, "CO2"), "ALTO") == 0) {
             estadoActual = "ALTO";
         } else if (strcmp(evaluarContaminante(registros[0].pm25, "PM2.5"), "MODERADO") == 0 || 
                    strcmp(evaluarContaminante(registros[0].pm10, "PM10"), "MODERADO") == 0 || 
                    strcmp(evaluarContaminante(registros[0].o3, "O3"), "MODERADO") == 0 || 
                    strcmp(evaluarContaminante(registros[0].no2, "NO2"), "MODERADO") == 0 || 
                    strcmp(evaluarContaminante(registros[0].so2, "SO2"), "MODERADO") == 0 || 
-                   strcmp(evaluarContaminante(registros[0].co, "CO"), "MODERADO") == 0) {
+                   strcmp(evaluarContaminante(registros[0].co2, "CO2"), "MODERADO") == 0) {
             estadoActual = "MODERADO";
         }
         
@@ -311,7 +311,7 @@ void mostrarLimitesAceptables() {
     printf("O3\t\t0-60\t\t61-100\t\t>100\t\tμg/m³\n");
     printf("NO2\t\t0-15\t\t16-25\t\t>25\t\tμg/m³\n");
     printf("SO2\t\t0-25\t\t26-40\t\t>40\t\tμg/m³\n");
-    printf("CO\t\t0-2\t\t3-4\t\t>4\t\tmg/m³\n");
+    printf("CO2\t\t0-2\t\t3-4\t\t>4\t\tmg/m³\n");
     printf("================================================================\n\n");
 }
 
@@ -476,7 +476,7 @@ void mostrarPrediccion24h(struct Registrocotocollao registros[], int numRegistro
     // Extraer valores de los ultimos 7 dias para cada contaminante
     int diasAnalisis = (numRegistros > 7) ? 7 : numRegistros;
     
-    int pm25[7], pm10[7], o3[7], no2[7], so2[7], co[7];
+    int pm25[7], pm10[7], o3[7], no2[7], so2[7], co2[7];
     
     // Copiar ultimos valores
     for (int i = 0; i < diasAnalisis; i++) {
@@ -485,7 +485,7 @@ void mostrarPrediccion24h(struct Registrocotocollao registros[], int numRegistro
         o3[i] = registros[i].o3;
         no2[i] = registros[i].no2;
         so2[i] = registros[i].so2;
-        co[i] = registros[i].co;
+        co2[i] = registros[i].co2;
     }
     
     // Calcular tendencias
@@ -494,7 +494,7 @@ void mostrarPrediccion24h(struct Registrocotocollao registros[], int numRegistro
     float tendenciaO3 = calcularTendencia(o3, diasAnalisis);
     float tendenciaNO2 = calcularTendencia(no2, diasAnalisis);
     float tendenciaSO2 = calcularTendencia(so2, diasAnalisis);
-    float tendenciaCO = calcularTendencia(co, diasAnalisis);
+    float tendenciaCO = calcularTendencia(co2, diasAnalisis);
     
     // Generar predicciones con factor climatico
     int predPM25 = predecirConClima(pm25, diasAnalisis, tendenciaPM25, clima);
@@ -502,7 +502,7 @@ void mostrarPrediccion24h(struct Registrocotocollao registros[], int numRegistro
     int predO3 = predecirConClima(o3, diasAnalisis, tendenciaO3, clima);
     int predNO2 = predecirConClima(no2, diasAnalisis, tendenciaNO2, clima);
     int predSO2 = predecirConClima(so2, diasAnalisis, tendenciaSO2, clima);
-    int predCO = predecirConClima(co, diasAnalisis, tendenciaCO, clima);
+    int predCO = predecirConClima(co2, diasAnalisis, tendenciaCO, clima);
     
     // Mostrar factor climatico
     float factorClimatico = calcularFactorClimatico(clima);
@@ -527,7 +527,7 @@ void mostrarPrediccion24h(struct Registrocotocollao registros[], int numRegistro
     printf("SO2\t\t%d\t\t%.1f\t\t%d\t\t%s\n", 
            so2[0], tendenciaSO2, predSO2, evaluarContaminante(predSO2, "SO2"));
     printf("CO\t\t%d\t\t%.1f\t\t%d\t\t%s\n", 
-           co[0], tendenciaCO, predCO, evaluarContaminante(predCO, "CO"));
+           co2[0], tendenciaCO, predCO, evaluarContaminante(predCO, "CO"));
     
     printf("===============================================================================\n");
     
@@ -538,14 +538,14 @@ void mostrarPrediccion24h(struct Registrocotocollao registros[], int numRegistro
         strcmp(evaluarContaminante(predO3, "O3"), "ALTO") == 0 || 
         strcmp(evaluarContaminante(predNO2, "NO2"), "ALTO") == 0 || 
         strcmp(evaluarContaminante(predSO2, "SO2"), "ALTO") == 0 || 
-        strcmp(evaluarContaminante(predCO, "CO"), "ALTO") == 0) {
+        strcmp(evaluarContaminante(predCO, "CO2"), "ALTO") == 0) {
         estadoFuturo = "ALTO";
     } else if (strcmp(evaluarContaminante(predPM25, "PM2.5"), "MODERADO") == 0 || 
                strcmp(evaluarContaminante(predPM10, "PM10"), "MODERADO") == 0 || 
                strcmp(evaluarContaminante(predO3, "O3"), "MODERADO") == 0 || 
                strcmp(evaluarContaminante(predNO2, "NO2"), "MODERADO") == 0 || 
                strcmp(evaluarContaminante(predSO2, "SO2"), "MODERADO") == 0 || 
-               strcmp(evaluarContaminante(predCO, "CO"), "MODERADO") == 0) {
+               strcmp(evaluarContaminante(predCO, "CO2"), "MODERADO") == 0) {
         estadoFuturo = "MODERADO";
     }
     
@@ -564,7 +564,7 @@ void mostrarPrediccion24h(struct Registrocotocollao registros[], int numRegistro
         prediccionRegistro.o3 = predO3;
         prediccionRegistro.no2 = predNO2;
         prediccionRegistro.so2 = predSO2;
-        prediccionRegistro.co = predCO;
+        prediccionRegistro.co2 = predCO;
         
         mostrarRecomendacionesEspecificas(prediccionRegistro);
         
@@ -685,8 +685,8 @@ void calcularPromediosHistoricos(struct Registrocotocollao registros[], int numR
             sumasPonderadasSO2 += registros[i].so2 * peso;
             contSO2++;
         }
-        if (registros[i].co > 0) {
-            sumasPonderadasCO += registros[i].co * peso;
+        if (registros[i].co2 > 0) {
+            sumasPonderadasCO += registros[i].co2 * peso;
             contCO++;
         }
         
@@ -700,7 +700,7 @@ void calcularPromediosHistoricos(struct Registrocotocollao registros[], int numR
             strcmp(evaluarContaminante(registros[i].o3, "O3"), "ALTO") == 0 || 
             strcmp(evaluarContaminante(registros[i].no2, "NO2"), "ALTO") == 0 || 
             strcmp(evaluarContaminante(registros[i].so2, "SO2"), "ALTO") == 0 || 
-            strcmp(evaluarContaminante(registros[i].co, "CO"), "ALTO") == 0) {
+            strcmp(evaluarContaminante(registros[i].co2, "CO2"), "ALTO") == 0) {
             estadoGeneral = "ALTO";
             diasAltos += (int)(peso * 100);  // Dias recientes pesan mas (peso 0-1)
         } else if (strcmp(evaluarContaminante(registros[i].pm25, "PM2.5"), "MODERADO") == 0 || 
@@ -708,7 +708,7 @@ void calcularPromediosHistoricos(struct Registrocotocollao registros[], int numR
                    strcmp(evaluarContaminante(registros[i].o3, "O3"), "MODERADO") == 0 || 
                    strcmp(evaluarContaminante(registros[i].no2, "NO2"), "MODERADO") == 0 || 
                    strcmp(evaluarContaminante(registros[i].so2, "SO2"), "MODERADO") == 0 || 
-                   strcmp(evaluarContaminante(registros[i].co, "CO"), "MODERADO") == 0) {
+                   strcmp(evaluarContaminante(registros[i].co2, "CO2"), "MODERADO") == 0) {
             estadoGeneral = "MODERADO";
             diasModerados += (int)(peso * 100);
         } else {
@@ -752,7 +752,7 @@ void calcularPromediosHistoricos(struct Registrocotocollao registros[], int numR
                promedios[4], contSO2, evaluarContaminante((int)promedios[4], "SO2"));
     }
     if (contCO > 0) {
-        printf("CO\t\t%.1f\t\t%d\t\t%s\t\t4.0\n", 
+        printf("CO2\t\t%.1f\t\t%d\t\t%s\t\t4.0\n", 
                promedios[5], contCO, evaluarContaminante((int)promedios[5], "CO"));
     }
     
@@ -801,8 +801,8 @@ void compararConLimitesOMS(float promedios[], const char* nombreZona) {
         printf("ALERTA: SO2 promedio (%.1f) supera limite OMS (40.0)\n", promedios[4]);
         problemasDetectados++;
     }
-    if (promedios[5] > 4) {  // CO
-        printf("ALERTA: CO promedio (%.1f) supera limite OMS (4.0)\n", promedios[5]);
+    if (promedios[5] > 4) {  // CO2
+        printf("ALERTA: CO2 promedio (%.1f) supera limite OMS (4.0)\n", promedios[5]);
         problemasDetectados++;
     }
     
@@ -864,8 +864,8 @@ void mostrarRecomendacionesEspecificas(struct Registrocotocollao registro) {
     }
     
     // Verificar CO
-    if (registro.co > 4) {
-        printf("\nCO ALTO (%d mg/m³) - Monoxido de carbono:\n", registro.co);
+    if (registro.co2 > 4) {
+        printf("\nCO2 ALTO (%d mg/m³) - Dioxido de carbono:\n", registro.co2);
         printf("- Revision tecnica de vehiculos en mal estado\n");
         printf("- Cierre de estacionamientos subterraneos mal ventilados\n");
         printf("- Campanas de ventilacion en hogares e industrias con uso de combustibles\n");
@@ -957,11 +957,11 @@ void generarReporte(struct Registrocotocollao registros[], int numRegistros, con
     fprintf(archivo, "- O3: 100 μg/m³\n");
     fprintf(archivo, "- NO2: 25 μg/m³\n");
     fprintf(archivo, "- SO2: 40 μg/m³\n");
-    fprintf(archivo, "- CO: 4 mg/m³\n\n");
+    fprintf(archivo, "- CO2: 4 mg/m³\n\n");
     
     // Calcular y escribir promedios
     float sumaPM25 = 0, sumaPM10 = 0, sumaO3 = 0, sumaNO2 = 0, sumaSO2 = 0, sumaCO = 0;
-    int contPM25 = 0, contPM10 = 0, contO3 = 0, contNO2 = 0, contSO2 = 0, contCO = 0;
+    int contPM25 = 0, contPM10 = 0, contO3 = 0, contNO2 = 0, contSO2 = 0, contCO2 = 0;
     int diasBuenos = 0, diasModerados = 0, diasAltos = 0;
     
     for(int i = 0; i < numRegistros; i++){
@@ -985,9 +985,9 @@ void generarReporte(struct Registrocotocollao registros[], int numRegistros, con
             sumaSO2 += registros[i].so2;
             contSO2++;
         }
-        if(registros[i].co > 0){
-            sumaCO += registros[i].co;
-            contCO++;
+        if(registros[i].co2 > 0){
+            sumaCO += registros[i].co2;
+            contCO2++;
         }
         
         // Evaluar calidad del dia
@@ -1009,8 +1009,8 @@ void generarReporte(struct Registrocotocollao registros[], int numRegistros, con
         if(registros[i].so2 > 40) excesosAltos++;
         else if(registros[i].so2 > 30) excesosLeves++;
         
-        if(registros[i].co > 4) excesosAltos++;
-        else if(registros[i].co > 3) excesosLeves++;
+        if(registros[i].co2 > 4) excesosAltos++;
+        else if(registros[i].co2 > 3) excesosLeves++;
         
         if(excesosAltos > 0){
             diasAltos++;
@@ -1043,8 +1043,8 @@ void generarReporte(struct Registrocotocollao registros[], int numRegistros, con
     if(contSO2 > 0) fprintf(archivo, " %s", (sumaSO2/contSO2) > 40 ? "(EXCEDE LIMITE OMS)" : "(DENTRO DEL LIMITE)");
     fprintf(archivo, "\n");
     
-    fprintf(archivo, "- CO: %.1f mg/m³", contCO > 0 ? sumaCO/contCO : 0);
-    if(contCO > 0) fprintf(archivo, " %s", (sumaCO/contCO) > 4 ? "(EXCEDE LIMITE OMS)" : "(DENTRO DEL LIMITE)");
+    fprintf(archivo, "- CO2: %.1f mg/m³", contCO2 > 0 ? sumaCO/contCO2 : 0);
+    if(contCO2 > 0) fprintf(archivo, " %s", (sumaCO/contCO2) > 4 ? "(EXCEDE LIMITE OMS)" : "(DENTRO DEL LIMITE)");
     fprintf(archivo, "\n\n");
     
     // Escribir resumen de calidad del aire
@@ -1067,7 +1067,7 @@ void generarReporte(struct Registrocotocollao registros[], int numRegistros, con
         fprintf(archivo, "%d\t", registros[i].o3);
         fprintf(archivo, "%d\t", registros[i].no2);
         fprintf(archivo, "%d\t", registros[i].so2);
-        fprintf(archivo, "%d\n", registros[i].co);
+        fprintf(archivo, "%d\n", registros[i].co2);
     }
     
     // Escribir recomendaciones
