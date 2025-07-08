@@ -1,0 +1,6 @@
+zona,temperatura,presion,humedad
+Centro,13,1028,87
+Belisario,13,1028,87
+Cotocollao,13,1028,87
+Los_Chillos,13,1028,87
+Carapungo,13,1028,87

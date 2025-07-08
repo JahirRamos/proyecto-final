@@ -5,6 +5,9 @@
 int main (int argc, char *argv[]) {
     int opcion;
     
+    // Inicializar datos climaticos al inicio del programa
+    inicializarDatosClimaticos();
+    
     do {
         opcion = menu();
         
@@ -14,6 +17,22 @@ int main (int argc, char *argv[]) {
                 break;
                 
             case 2:
+                prediccionNivelesFuturos();
+                break;
+                
+            case 3:
+                analisisHistorico();
+                break;
+                
+            case 4:
+                exportarDatos();
+                break;
+                
+            case 5:
+                mostrarDatosClimaticos();
+                break;
+                
+            case 6:
                 printf("Saliendo del programa...\n");
                 break;
                 
@@ -22,13 +41,13 @@ int main (int argc, char *argv[]) {
                 break;
         }
         
-        if (opcion != 2) {
+        if (opcion != 6) {
             printf("\nPresione Enter para continuar");
             getchar(); 
             getchar(); 
         }
         
-    } while (opcion != 2);
+    } while (opcion != 6);
     
     return 0;
 }
