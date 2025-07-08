@@ -1,0 +1,49 @@
+=== REPORTE DE CALIDAD DEL AIRE ===
+Zona: Tumbaco
+Fecha de generacion: 07/07/2025
+Periodo analizado: Ultimos 30 dias
+======================================
+
+LIMITES OMS 2021 (24 horas):
+- PM2.5: 15 μg/m³
+- PM10: 45 μg/m³
+- O3: 100 μg/m³
+- NO2: 25 μg/m³
+- SO2: 40 μg/m³
+- CO2: 4 mg/m³
+
+PROMEDIOS DE 30 DIAS:
+- PM2.5: 27.8 μg/m³ (EXCEDE LIMITE OMS)
+- PM10: 31.7 μg/m³ (DENTRO DEL LIMITE)
+- O3: 32.3 μg/m³ (DENTRO DEL LIMITE)
+- NO2: 13.7 μg/m³ (DENTRO DEL LIMITE)
+- SO2: 1.5 μg/m³ (DENTRO DEL LIMITE)
+- CO2: 5.4 mg/m³ (EXCEDE LIMITE OMS)
+
+RESUMEN DE CALIDAD DEL AIRE (30 DIAS):
+- Dias con calidad BUENA: 0
+- Dias con calidad MODERADA: 0
+- Dias con calidad ALTA/PELIGROSA: 30
+- Total de dias analizados: 30
+
+DATOS DETALLADOS (ULTIMOS 10 DIAS):
+Fecha		PM2.5	PM10	O3	NO2	SO2	CO
+------------------------------------------------------------
+7/6/2025	41	46	34	16	2	6
+7/5/2025	31	35	35	17	2	7
+7/4/2025	26	32	37	15	1	5
+7/3/2025	21	28	36	15	1	5
+7/2/2025	34	38	41	11	2	4
+7/1/2025	32	30	28	16	2	5
+6/30/2025	33	34	29	16	2	4
+6/29/2025	28	31	30	17	1	5
+6/28/2025	25	29	31	9	1	6
+6/27/2025	29	33	28	14	2	5
+
+RECOMENDACIONES GENERALES:
+- ALERTA: La zona presenta frecuentes excesos de contaminantes
+- Se recomienda implementar medidas urgentes de control
+- Evitar actividades fisicas intensas al aire libre
+- Usar mascarillas en dias de alta contaminacion
+
+=== FIN DEL REPORTE ===
