@@ -654,38 +654,46 @@ void analizarZonaHistorica(int numeroZona) {
 }
 
 void calcularPromediosHistoricos(struct Registrocotocollao registros[], int numRegistros, const char* nombreZona) {
-    float sumasPM25 = 0, sumasPM10 = 0, sumasO3 = 0, sumasNO2 = 0, sumasSO2 = 0, sumasCO = 0;
+    float sumasPonderadasPM25 = 0, sumasPonderadasPM10 = 0, sumasPonderadasO3 = 0;
+    float sumasPonderadasNO2 = 0, sumasPonderadasSO2 = 0, sumasPonderadasCO = 0;
+    float sumasPesos = 0;
     int contPM25 = 0, contPM10 = 0, contO3 = 0, contNO2 = 0, contSO2 = 0, contCO = 0;
     int diasBuenos = 0, diasModerados = 0, diasAltos = 0;
     
-    // Calcular sumas y contadores para cada contaminante
+    // Calcular promedios ponderados - mas peso a dias recientes
     for (int i = 0; i < numRegistros; i++) {
+        // Peso lineal: dia mas reciente (i=0) = peso maximo, decayendo linealmente
+        float peso = (float)(numRegistros - i) / numRegistros;  // Peso decae linealmente con la edad
+        
         if (registros[i].pm25 > 0) {
-            sumasPM25 += registros[i].pm25;
+            sumasPonderadasPM25 += registros[i].pm25 * peso;
             contPM25++;
         }
         if (registros[i].pm10 > 0) {
-            sumasPM10 += registros[i].pm10;
+            sumasPonderadasPM10 += registros[i].pm10 * peso;
             contPM10++;
         }
         if (registros[i].o3 > 0) {
-            sumasO3 += registros[i].o3;
+            sumasPonderadasO3 += registros[i].o3 * peso;
             contO3++;
         }
         if (registros[i].no2 > 0) {
-            sumasNO2 += registros[i].no2;
+            sumasPonderadasNO2 += registros[i].no2 * peso;
             contNO2++;
         }
         if (registros[i].so2 > 0) {
-            sumasSO2 += registros[i].so2;
+            sumasPonderadasSO2 += registros[i].so2 * peso;
             contSO2++;
         }
         if (registros[i].co > 0) {
-            sumasCO += registros[i].co;
+            sumasPonderadasCO += registros[i].co * peso;
             contCO++;
         }
         
-        // Evaluar estado general del dia
+        // Acumular peso para normalizacion
+        sumasPesos += peso;
+        
+        // Evaluar estado general del dia (con peso mayor para dias recientes)
         char *estadoGeneral = "BUENO";
         if (strcmp(evaluarContaminante(registros[i].pm25, "PM2.5"), "ALTO") == 0 || 
             strcmp(evaluarContaminante(registros[i].pm10, "PM10"), "ALTO") == 0 || 
@@ -694,7 +702,7 @@ void calcularPromediosHistoricos(struct Registrocotocollao registros[], int numR
             strcmp(evaluarContaminante(registros[i].so2, "SO2"), "ALTO") == 0 || 
             strcmp(evaluarContaminante(registros[i].co, "CO"), "ALTO") == 0) {
             estadoGeneral = "ALTO";
-            diasAltos++;
+            diasAltos += (int)(peso * 100);  // Dias recientes pesan mas (peso 0-1)
         } else if (strcmp(evaluarContaminante(registros[i].pm25, "PM2.5"), "MODERADO") == 0 || 
                    strcmp(evaluarContaminante(registros[i].pm10, "PM10"), "MODERADO") == 0 || 
                    strcmp(evaluarContaminante(registros[i].o3, "O3"), "MODERADO") == 0 || 
@@ -702,20 +710,20 @@ void calcularPromediosHistoricos(struct Registrocotocollao registros[], int numR
                    strcmp(evaluarContaminante(registros[i].so2, "SO2"), "MODERADO") == 0 || 
                    strcmp(evaluarContaminante(registros[i].co, "CO"), "MODERADO") == 0) {
             estadoGeneral = "MODERADO";
-            diasModerados++;
+            diasModerados += (int)(peso * 100);
         } else {
-            diasBuenos++;
+            diasBuenos += (int)(peso * 100);
         }
     }
     
-    // Calcular promedios
+    // Calcular promedios ponderados normalizados
     float promedios[6];
-    promedios[0] = (contPM25 > 0) ? sumasPM25 / contPM25 : 0;
-    promedios[1] = (contPM10 > 0) ? sumasPM10 / contPM10 : 0;
-    promedios[2] = (contO3 > 0) ? sumasO3 / contO3 : 0;
-    promedios[3] = (contNO2 > 0) ? sumasNO2 / contNO2 : 0;
-    promedios[4] = (contSO2 > 0) ? sumasSO2 / contSO2 : 0;
-    promedios[5] = (contCO > 0) ? sumasCO / contCO : 0;
+    promedios[0] = (contPM25 > 0) ? sumasPonderadasPM25 / sumasPesos : 0;
+    promedios[1] = (contPM10 > 0) ? sumasPonderadasPM10 / sumasPesos : 0;
+    promedios[2] = (contO3 > 0) ? sumasPonderadasO3 / sumasPesos : 0;
+    promedios[3] = (contNO2 > 0) ? sumasPonderadasNO2 / sumasPesos : 0;
+    promedios[4] = (contSO2 > 0) ? sumasPonderadasSO2 / sumasPesos : 0;
+    promedios[5] = (contCO > 0) ? sumasPonderadasCO / sumasPesos : 0;
     
     // Mostrar resultados
     printf("\n=== PROMEDIOS HISTORICOS (30 DIAS) - %s ===\n", nombreZona);
@@ -753,9 +761,16 @@ void calcularPromediosHistoricos(struct Registrocotocollao registros[], int numR
     // Resumen general
     printf("\n=== RESUMEN HISTORICO (30 DIAS) - %s ===\n", nombreZona);
     printf("Total de dias analizados: %d\n", numRegistros);
-    printf("Dias con calidad BUENA: %d (%.1f%%)\n", diasBuenos, (float)diasBuenos/numRegistros*100);
-    printf("Dias con calidad MODERADA: %d (%.1f%%)\n", diasModerados, (float)diasModerados/numRegistros*100);
-    printf("Dias con calidad ALTA: %d (%.1f%%)\n", diasAltos, (float)diasAltos/numRegistros*100);
+    
+    // Calcular porcentajes basados en el peso total
+    int totalPesoPorcentaje = diasBuenos + diasModerados + diasAltos;
+    if (totalPesoPorcentaje > 0) {
+        printf("Dias con calidad BUENA: %.1f%% (peso ponderado)\n", (float)diasBuenos/totalPesoPorcentaje*100);
+        printf("Dias con calidad MODERADA: %.1f%% (peso ponderado)\n", (float)diasModerados/totalPesoPorcentaje*100);
+        printf("Dias con calidad ALTA: %.1f%% (peso ponderado)\n", (float)diasAltos/totalPesoPorcentaje*100);
+    } else {
+        printf("No hay datos suficientes para calcular porcentajes.\n");
+    }
     
     // Comparar con limites OMS
     compararConLimitesOMS(promedios, nombreZona);
